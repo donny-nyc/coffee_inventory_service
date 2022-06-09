@@ -1,21 +1,20 @@
 import { 
-	Model, 
+	Association,
+	CreationOptional,
+	DataTypes,
+	HasOneSetAssociationMixin,
 	InferAttributes, 
 	InferCreationAttributes, 
-	CreationOptional,
-	Association,
-	DataTypes,
-	HasOneHasAssociationMixin,
-	HasOneAddAssociationMixin,
-	HasOneGetAssociationMixin,
-	HasOneRemoveAssociationMixin,
+	Model, 
 	NonAttribute
 } from 'sequelize';
 
-import sequelizeConnection from '../../config/db'
+import { AssetType } from './asset_type';
 
-class Asset extends Model<InferAttributes<Asset, { omit: 'asset_category' }>,
-	InferCreationAttributes<Asset, { omit: 'asset_category' }>> {
+import sequelize from '../../config/db'
+
+export class Asset extends Model<InferAttributes<Asset, { omit: 'assetType' }>,
+	InferCreationAttributes<Asset, { omit: 'assetType' }>> {
 	
 	// id can be undefined during creation when using `autoIncrement`
 	declare id: CreationOptional<number>;
@@ -23,27 +22,32 @@ class Asset extends Model<InferAttributes<Asset, { omit: 'asset_category' }>,
 	// Since TS cannot determine model associations at compile time
 	// we declare them here purely virtually
 	// these will not exist until `Model.init` gets called
-	declare getAssetCategory: HasOneGetAssociationMixin<AssetCategory>;
-	declare setAssetCategory: HasOneSetAssociationMixin<AssetCategory>;
-	declare removeAssetCategory: HasOneRemoveAssociationMixin<AssetCategory>;
-	declare hasAssetCategory: HasOneHasAssociationMixin<AssetCategory>;
+	declare setAssetType: HasOneSetAssociationMixin<AssetType, number>;
+/*
+	declare getAssetType: HasOneGetAssociationMixin<AssetType>;
+	declare setAssetType: HasOneSetAssociationMixin<AssetType>;
+	declare removeAssetType: HasOneRemoveAssociationMixin<AssetType>;
+	declare hasAssetType: HasOneHasAssociationMixin<AssetType>;
 
-	declare assetCategory?: NonAttribute<AssetCategory>;
+
+*/
+	declare assetType?: NonAttribute<AssetType>;
 
 	declare static associations: {
-		assetCategory: Association<Asset, AssetCategory>;
+		assetType: Association<Asset, AssetType>;
 	};
 };
 
 Asset.init({
 	id: {
-		type: DataTypes.INTEGER.UNSIGNED,
+		type: DataTypes.INTEGER,
 		autoIncrement: true,
 		primaryKey: true
 	},
 }, {
-	sequelizeConnection, // pass in the connection instance
-	modelName: 'Asset'
+	sequelize, // pass in the connection instance
+	modelName: 'Asset',
+	tableName: 'assets'
 });
 
-console.log(Asset === sequelizeConnection.models.Asset);
+Asset.belongsTo(AssetType);

@@ -5,6 +5,8 @@ import expressWinston from 'express-winston'
 import winston from 'winston'
 import { baseRouter } from './routes/base'
 import sequelizeConnection from '../config/db'
+import { AssetType } from './models/asset_type';
+import { Asset } from './models/asset';
 
 const app = express();
 
@@ -64,5 +66,21 @@ try {
 } catch (error: any) {
 	console.log(`Error occured: ${error.message}`);
 }
+
+let a: AssetType;
+
+AssetType.create({ name: "Ground Coffee", description: "It's coffee, from the ground" }).then((assetType) => { a = assetType; console.log("created coffee type") }).catch((error: any) => {
+	console.error(error.message);
+});
+
+let ast: Asset;
+
+Asset.create().then((asset: Asset) => {
+	ast = asset;
+	ast.setAssetType(a);
+	console.log(JSON.stringify(ast, null, 4));
+}).catch((err: any) => {
+	console.error(err.message);
+});
 
 module.exports = app;

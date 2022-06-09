@@ -2,25 +2,28 @@ import { DataTypes } from 'sequelize';
 import { Migration } from '../../../umzug';
 
 export const up: Migration = async ({ context: sequelize }) => {
-	await sequelize.getQueryInterface().createTable('asset_types', {
+	await sequelize.getQueryInterface().createTable('assets', {
 		id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			autoIncrement: true,
 			primaryKey: true,
 		},
-		name: {
-			type: DataTypes.STRING,
-			unique: true,
-			allowNull: false,
+		assetTypeId: {
+			type: DataTypes.INTEGER,
+			references: { model: 'asset_types', key: 'id' }
 		},
-		description: {
-			type: DataTypes.STRING,
-			allowNull: true,
+		createdAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			allowNull: false
 		}
 	});
 };
 
 export const down: Migration = async ({ context: sequelize }) => {
-	await sequelize.getQueryInterface().dropTable('asset_types');
+	await sequelize.getQueryInterface().dropTable('assets');
 };
