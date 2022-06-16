@@ -3,10 +3,12 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import expressWinston from 'express-winston'
 import winston from 'winston'
-import { baseRouter } from './routes/base'
+import { baseRouter } from './routes/base';
+import { assetRouter } from './routes/assets';
 import sequelizeConnection from '../config/db'
 import { AssetType } from './models/asset_type';
 import { Asset } from './models/asset';
+import { Location } from './models/location';
 
 const app = express();
 
@@ -38,6 +40,7 @@ app.use(expressWinston.errorLogger({
 app.use(express.json());
 
 app.use("/api", baseRouter);
+app.use("/api/assets", assetRouter);
 
 app.get("/", (req: Request, res: Response) => {
 	res.status(200).json("Welcome to the Inventory Manager");
@@ -46,13 +49,6 @@ app.get("/", (req: Request, res: Response) => {
 sequelizeConnection.authenticate()
 .then(() => {
 	console.log('Postgre connection successful');
-}).catch((error: any) => {
-	console.error(error.message);
-});
-
-sequelizeConnection.sync()
-.then(() => {
-	console.log('successfully synchronized the database');
 }).catch((error: any) => {
 	console.error(error.message);
 });
@@ -66,21 +62,5 @@ try {
 } catch (error: any) {
 	console.log(`Error occured: ${error.message}`);
 }
-
-let a: AssetType;
-
-AssetType.create({ name: "Ground Coffee", description: "It's coffee, from the ground" }).then((assetType) => { a = assetType; console.log("created coffee type") }).catch((error: any) => {
-	console.error(error.message);
-});
-
-let ast: Asset;
-
-Asset.create().then((asset: Asset) => {
-	ast = asset;
-	ast.setAssetType(a);
-	console.log(JSON.stringify(ast, null, 4));
-}).catch((err: any) => {
-	console.error(err.message);
-});
 
 module.exports = app;

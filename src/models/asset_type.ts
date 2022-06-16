@@ -31,6 +31,7 @@ AssetType.init({
 	timestamps: false,
 	sequelize,
 	tableName: 'asset_types',
+	modelName: 'assetType',
 });
 
 export default AssetType;
